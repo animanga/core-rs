@@ -39,3 +39,5 @@ failure = "0.1.5"
 failure_derive = "0.1.5"
 futures = "0.1"
 tokio = "0.1"
+
+heapsize = "0.4.2"

@@ -19,6 +19,7 @@ use database::Environment;
 use database::ReadTransaction;
 use hash::Blake2bHash;
 use utils::mutable_once::MutableOnce;
+use heapsize::HeapSizeOf;
 
 pub type SerializedChunk = Vec<u8>;
 
@@ -91,8 +92,6 @@ impl AccountsChunkCache {
                 None => return,
             };
 
-            trace!("Computing chunks for block {}", hash);
-
             // Check that this hash is not yet worked on.
             {
                 let mut guard = this.tasks_by_block.write();
@@ -101,6 +100,18 @@ impl AccountsChunkCache {
                 }
                 // Requests for accounts tree chunks of `block` are accepted now.
                 guard.insert(hash.clone(), Vec::new());
+            }
+
+            trace!("Computing chunks for block {}", hash);
+            trace!("Heap size dump:");
+            {
+                let lock = this.chunks_by_prefix_by_block.read();
+                let size = lock.heap_size_of_children();
+                trace!("AccountsChunkCache::chunks_by_prefix_by_block: {} bytes", size);
+                for (key, value) in lock.iter() {
+                    trace!("AccountsChunkCache::chunks_by_prefix_by_block: {} -> {} bytes", key, value.heap_size_of_children());
+                }
+
             }
 
             // Compute and store chunks.
