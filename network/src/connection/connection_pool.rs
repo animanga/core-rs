@@ -498,12 +498,14 @@ impl ConnectionPool {
 
             // Close connection if we have too many connections to the peer's IP address.
             if state.get_num_connections_by_net_address(&net_address) > network_primitives::PEER_COUNT_PER_IP_MAX {
+                debug!("Closing because limit address: {} ({})", net_address, state.get_num_connections_by_net_address(&net_address));
                 ConnectionPool::close(info.network_connection(), CloseType::ConnectionLimitPerIp);
                 return false;
             }
 
             // Close connection if we have too many connections to the peer's subnet.
             if state.get_num_connections_by_subnet(&net_address) > network_primitives::INBOUND_PEER_COUNT_PER_SUBNET_MAX {
+                debug!("Closing because limit subnet: {} ({})", net_address, state.get_num_connections_by_subnet(&net_address));
                 ConnectionPool::close(info.network_connection(), CloseType::ConnectionLimitPerIp);
                 return false;
             }
