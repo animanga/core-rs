@@ -460,6 +460,7 @@ impl NetworkAgent {
             }
 
             if (address.protocol() == Protocol::Ws || address.protocol() == Protocol::Wss) && !address.is_globally_reachable() {
+                debug!("Closing because not globally: {}", address.as_uri());
                 self.channel.close(CloseType::AddrNotGloballyReachable);
                 return;
             }
